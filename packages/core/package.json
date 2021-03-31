@@ -1,11 +1,14 @@
 {
   "name": "@ii-cli/core",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "> TODO: description",
   "author": "<bgl_cumt_zju@163.com>",
   "homepage": "",
   "license": "ISC",
   "main": "lib/core.js",
+  "bin": {
+    "ii-cli": "bin/index.js"
+  },
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -20,6 +23,7 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@ii-cli/utils": "^0.0.2"
-  }
+    "@ii-cli/utils": "^1.0.0"
+  },
+  "gitHead": "21b7d7a8fe3f6d6c0b452a86bb36d9fe2dc49c4e"
 }
