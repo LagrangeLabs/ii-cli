@@ -17,7 +17,7 @@
     "lib"
   ],
   "publishConfig": {
-    "registry": "http://registry.npm.taobao.org/"
+    "access": "public"
   },
   "scripts": {
     "test": "echo \"Error: run tests from root\" && exit 1"
@@ -25,5 +25,5 @@
   "dependencies": {
     "@ii-cli/utils": "^1.0.5"
   },
-  "gitHead": "b116d3f7e4c19eec285ae98a53b190856660b0c4"
+  "gitHead": "99ff08e67dd6f82371c122aec0824f053f64643e"
 }
