@@ -1,6 +1,6 @@
 {
   "name": "@ii-cli/core",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "> TODO: description",
   "author": "<bgl_cumt_zju@163.com>",
   "homepage": "",
@@ -23,7 +23,7 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@ii-cli/utils": "^1.0.3"
+    "@ii-cli/utils": "^1.0.4"
   },
   "gitHead": "b50c20d02c6bb157d51c7c162fc66e1577d4a48f"
 }
