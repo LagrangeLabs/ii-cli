@@ -1,6 +1,6 @@
 {
   "name": "@ii-cli/utils",
-  "version": "1.0.2",
+  "version": "1.0.0",
   "description": "> TODO: description",
   "author": "<bgl_cumt_zju@163.com>",
   "homepage": "",
@@ -22,5 +22,5 @@
   "dependencies": {
     "lodash": "^4.17.21"
   },
-  "gitHead": "b85fb18e0895ad532095706444df509b62aac7ae"
+  "gitHead": "b50c20d02c6bb157d51c7c162fc66e1577d4a48f"
 }
