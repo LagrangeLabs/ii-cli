@@ -23,7 +23,9 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@ii-cli/utils": "file:../../utils/utils"
+    "@ii-cli/utils": "file:../../utils/utils",
+    "import-local": "^3.0.2",
+    "npmlog": "^4.1.2"
   },
   "gitHead": "99ff08e67dd6f82371c122aec0824f053f64643e"
 }
