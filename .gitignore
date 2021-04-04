@@ -4,8 +4,8 @@
 
 node_modules/
 
-packages/**/node_modules
-packages/**/package-lock.json
+*/**/node_modules
+*/**/package-lock.json
 
 
 *.log

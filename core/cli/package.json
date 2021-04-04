@@ -23,7 +23,7 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "@ii-cli/utils": "^1.0.6"
+    "@ii-cli/utils": "file:../../utils/utils"
   },
   "gitHead": "99ff08e67dd6f82371c122aec0824f053f64643e"
 }
