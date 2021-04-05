@@ -2,6 +2,13 @@
 
 module.exports = core;
 
+const pkg = require('../package.json');
+const log = require('@ii-cli/log');
+
 function core() {
-  console.log('exec core');
+  checkPkgVer();
+}
+
+function checkPkgVer() {
+  log.info('cli', pkg.version);
 }
