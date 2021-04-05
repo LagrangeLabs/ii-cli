@@ -2,6 +2,8 @@
 
 const semver = require('semver');
 const colors = require('colors/safe');
+const userHome = require('user-home');
+const pathExists = require('path-exists').sync; // 使用同步
 const pkg = require('../package.json');
 const log = require('@ii-cli/log');
 const { LOWEST_NODE_VERSION } = require('./const');
@@ -11,6 +13,7 @@ function core() {
     checkPkgVer();
     checkNodeVer();
     checkRoot();
+    checkUserHome();
   } catch (e) {
     log.error(e.message);
   }
@@ -35,10 +38,17 @@ function checkNodeVer() {
  * + 通过 root-check 对用户进行了降级
  */
 function checkRoot() {
-  // root-check 利用 process.getuid API 可以获取当前用户登录的 id(默认是 501)。如果通过 sudo 启动，则是0(即超级管理员，root账户)
+  // root-check 利用 process.getuid API 可以获取当前用户登录的 id(darwin操作系统默认是 501)。如果通过 sudo 启动，则是0(darwin操作系统 0 表示是超级管理员，即root账户)
   // root-check 利用 process.setuid/process.setgid API 来修改用户登录的id
   const rootCheck = require('root-check');
   rootCheck();
+}
+
+// 检查用户主目录是否存在
+function checkUserHome() {
+  if (!userHome || !pathExists(userHome)) {
+    throw new Error(colors.red('当前登录用户的主目录不存在'));
+  }
 }
 
 module.exports = core;
