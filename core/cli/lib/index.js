@@ -1,12 +1,13 @@
 'use strict';
 
+const path = require('path');
 const semver = require('semver');
 const colors = require('colors/safe');
 const userHome = require('user-home');
 const pathExists = require('path-exists').sync; // 使用同步
 const pkg = require('../package.json');
 const log = require('@ii-cli/log');
-const { LOWEST_NODE_VERSION } = require('./const');
+const { LOWEST_NODE_VERSION, DFT_CLI_HOME } = require('./const');
 
 let args;
 
@@ -18,6 +19,7 @@ function core() {
     checkUserHome();
     checkInputArgs();
     log.verbose('debug', 'test debug log');
+    checkEnv();
   } catch (e) {
     log.error(e.message);
   }
@@ -55,6 +57,9 @@ function checkUserHome() {
   }
 }
 
+/**
+ * 检查输入参数
+ */
 function checkInputArgs() {
   const minimist = require('minimist');
   args = minimist(process.argv.slice(2));
@@ -71,6 +76,41 @@ function checkArgs() {
 
   // 由于 require 是同步方法，导致 log = require('@ii-cli/log') 会先执行，所以此处要对 log.level 进行手动修改
   log.level = process.env.LOG_LEVEL;
+}
+
+/**
+ * 检查环境变量
+ */
+function checkEnv() {
+  const dotenv = require('dotenv');
+  const dotenvPath = path.resolve(userHome, '.env');
+
+  if (pathExists(dotenvPath)) {
+    dotenv.config({
+      path: dotenvPath,
+    });
+  }
+
+  createDftEnvCfg();
+
+  log.verbose('环境变量', process.env.CLI_HOME, process.env.CLI_HOME_PATH);
+}
+
+/**
+ * 创建默认的环境变量
+ */
+function createDftEnvCfg() {
+  const envConfig = {
+    home: userHome,
+  };
+
+  if (process.env.CLI_HOME) {
+    envConfig['cliHome'] = path.join(userHome, process.env.CLI_HOME);
+  } else {
+    envConfig['cliHome'] = path.join(userHome, DFT_CLI_HOME);
+  }
+
+  process.env.CLI_HOME_PATH = envConfig.cliHome;
 }
 
 module.exports = core;

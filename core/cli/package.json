@@ -26,6 +26,7 @@
     "@ii-cli/log": "file:../../utils/log",
     "@ii-cli/utils": "file:../../utils/utils",
     "colors": "^1.4.0",
+    "dotenv": "^8.2.0",
     "import-local": "^3.0.2",
     "minimist": "^1.2.5",
     "npmlog": "^4.1.2",
