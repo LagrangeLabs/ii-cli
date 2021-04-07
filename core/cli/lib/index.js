@@ -8,12 +8,16 @@ const pkg = require('../package.json');
 const log = require('@ii-cli/log');
 const { LOWEST_NODE_VERSION } = require('./const');
 
+let args;
+
 function core() {
   try {
     checkPkgVer();
     checkNodeVer();
     checkRoot();
     checkUserHome();
+    checkInputArgs();
+    log.verbose('debug', 'test debug log');
   } catch (e) {
     log.error(e.message);
   }
@@ -49,6 +53,24 @@ function checkUserHome() {
   if (!userHome || !pathExists(userHome)) {
     throw new Error(colors.red('当前登录用户的主目录不存在'));
   }
+}
+
+function checkInputArgs() {
+  const minimist = require('minimist');
+  args = minimist(process.argv.slice(2));
+
+  checkArgs();
+}
+
+function checkArgs() {
+  if (args.debug) {
+    process.env.LOG_LEVEL = 'verbose';
+  } else {
+    process.env.LOG_LEVEL = 'info';
+  }
+
+  // 由于 require 是同步方法，导致 log = require('@ii-cli/log') 会先执行，所以此处要对 log.level 进行手动修改
+  log.level = process.env.LOG_LEVEL;
 }
 
 module.exports = core;
