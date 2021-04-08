@@ -5,11 +5,14 @@ const semver = require('semver');
 const colors = require('colors/safe');
 const userHome = require('user-home');
 const pathExists = require('path-exists').sync; // 使用同步
+const commander = require('commander');
 const pkg = require('../package.json');
 const log = require('@ii-cli/log');
 const { LOWEST_NODE_VERSION, DFT_CLI_HOME } = require('./const');
 
 let args;
+
+const program = new commander.Command(); // 实例化一个脚手架对象
 
 function core() {
   try {
@@ -17,9 +20,9 @@ function core() {
     checkNodeVer();
     checkRoot();
     checkUserHome();
-    checkInputArgs();
-    log.verbose('debug', 'test debug log');
+    // checkInputArgs();
     checkEnv();
+    registerCommand();
   } catch (e) {
     log.error(e.message);
   }
@@ -111,6 +114,48 @@ function createDftEnvCfg() {
   }
 
   process.env.CLI_HOME_PATH = envConfig.cliHome;
+}
+
+/**
+ * 进行命令的注册
+ */
+function registerCommand() {
+  program
+    .name(Object.keys(pkg.bin)[0]) // 注册脚手架名称
+    .usage('<command> [options]')
+    .version(pkg.version) //注册版本号
+    .option('-d, --debug', '是否开启调试模式', true); // 为脚手架加上全局属性
+
+  // 监听debug时间，开启DEBUG模式
+  program.on('option:debug', function () {
+    console.log('debug:', program);
+    if (program.debug) {
+      process.env.LOG_LEVEL = 'verbose';
+    } else {
+      process.env.LOG_LEVEL = 'info';
+    }
+    log.level = process.env.LOG_LEVEL;
+    log.verbose('test');
+  });
+
+  // 监听未知命令
+  program.on('command:*', function (obj) {
+    const availableCommands = program.commands.map((cmd) => cmd.name());
+    console.log(colors.red('未知的命令：' + obj[0]));
+
+    if (availableCommands.length > 0) {
+      console.log(colors.red('可用的命令：' + availableCommands.join(',')));
+    }
+  });
+
+  // console.log('------', program);
+
+  if (program.args && program.args.length < 1) {
+    program.outputHelp(); // 未输入其他命令，输出帮助
+    console.log(); // 添加空行
+  } else {
+    program.parse(process.argv);
+  }
 }
 
 module.exports = core;
