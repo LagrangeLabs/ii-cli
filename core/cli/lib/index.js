@@ -8,6 +8,7 @@ const pathExists = require('path-exists').sync; // 使用同步
 const commander = require('commander');
 const pkg = require('../package.json');
 const log = require('@ii-cli/log');
+const init = require('@ii-cli/init');
 const { LOWEST_NODE_VERSION, DFT_CLI_HOME } = require('./const');
 
 let args;
@@ -137,6 +138,9 @@ function registerCommand() {
     log.level = process.env.LOG_LEVEL;
     log.verbose('test');
   });
+
+  // 进行命令注册
+  program.command('init [projectName]').option('-f, --force', '是否强制初始化项目').action(init);
 
   // 监听未知命令
   program.on('command:*', function (obj) {
