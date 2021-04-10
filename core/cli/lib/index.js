@@ -11,22 +11,26 @@ const log = require('@ii-cli/log');
 const init = require('@ii-cli/init');
 const { LOWEST_NODE_VERSION, DFT_CLI_HOME } = require('./const');
 
-let args;
-
 const program = new commander.Command(); // 实例化一个脚手架对象
 
-function core() {
+async function core() {
   try {
-    checkPkgVer();
-    checkNodeVer();
-    checkRoot();
-    checkUserHome();
-    // checkInputArgs();
-    checkEnv();
+    await prepare();
     registerCommand();
   } catch (e) {
     log.error(e.message);
   }
+}
+
+/**
+ * 进行预准备
+ */
+async function prepare() {
+  checkPkgVer();
+  checkNodeVer();
+  checkRoot();
+  checkUserHome();
+  checkEnv();
 }
 
 function checkPkgVer() {
@@ -62,27 +66,6 @@ function checkUserHome() {
 }
 
 /**
- * 检查输入参数
- */
-function checkInputArgs() {
-  const minimist = require('minimist');
-  args = minimist(process.argv.slice(2));
-
-  checkArgs();
-}
-
-function checkArgs() {
-  if (args.debug) {
-    process.env.LOG_LEVEL = 'verbose';
-  } else {
-    process.env.LOG_LEVEL = 'info';
-  }
-
-  // 由于 require 是同步方法，导致 log = require('@ii-cli/log') 会先执行，所以此处要对 log.level 进行手动修改
-  log.level = process.env.LOG_LEVEL;
-}
-
-/**
  * 检查环境变量
  */
 function checkEnv() {
@@ -96,8 +79,6 @@ function checkEnv() {
   }
 
   createDftEnvCfg();
-
-  log.verbose('环境变量', process.env.CLI_HOME, process.env.CLI_HOME_PATH);
 }
 
 /**
@@ -139,30 +120,26 @@ function registerCommand() {
 
   // 监听debug时间，开启DEBUG模式
   program.on('option:debug', function () {
-    console.log('debug:', program);
-    if (program.debug) {
+    const options = program.opts();
+    if (options.debug) {
       process.env.LOG_LEVEL = 'verbose';
     } else {
       process.env.LOG_LEVEL = 'info';
     }
-    log.level = process.env.LOG_LEVEL;
-    log.verbose('test');
-  });
 
-  // 进行命令注册
-  program.command('init [projectName]').option('-f, --force', '是否强制初始化项目').action(init);
+    // 由于 require 是同步方法，导致 log = require('@ii-cli/log') 会先执行，所以此处要对 log.level 进行手动修改
+    log.level = process.env.LOG_LEVEL;
+  });
 
   // 监听未知命令
   program.on('command:*', function (obj) {
     const availableCommands = program.commands.map((cmd) => cmd.name());
-    console.log(colors.red('未知的命令：' + obj[0]));
+    console.log(colors.red('未知命令：' + obj[0]));
 
     if (availableCommands.length > 0) {
       console.log(colors.red('可用的命令：' + availableCommands.join(',')));
     }
   });
-
-  // console.log('------', program);
 
   if (program.args && program.args.length < 1) {
     program.outputHelp(); // 未输入其他命令，输出帮助

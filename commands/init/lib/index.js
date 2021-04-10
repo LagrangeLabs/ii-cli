@@ -8,8 +8,9 @@ class InitCommand extends Command {
   exec() {}
 }
 
-function init(argv) {
-  return new InitCommand(argv);
+function init(projectName, cmdObj) {
+  console.log('init', projectName, cmdObj);
+  //   return new InitCommand(argv);
 }
 
 module.exports = init;
