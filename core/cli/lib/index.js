@@ -125,7 +125,17 @@ function registerCommand() {
     .name(Object.keys(pkg.bin)[0]) // 注册脚手架名称
     .usage('<command> [options]')
     .version(pkg.version) //注册版本号
-    .option('-d, --debug', '是否开启调试模式', true); // 为脚手架加上全局属性
+    .option('-d, --debug', '是否开启调试模式', true) // 为脚手架加上全局属性
+    .option('-tp, --targetPath <targetPath>', '是否指定本地调试文件路径', '');
+
+  // 进行命令注册
+  program.command('init [projectName]').option('-f, --force', '是否强制初始化项目').action(init);
+
+  program.on('option:targetPath', function () {
+    const options = program.opts();
+    // 通过设置环境变量来进行业务逻辑的解耦，避免进行参数传递
+    process.env.CL_TARGET_PATH = options.targetPath;
+  });
 
   // 监听debug时间，开启DEBUG模式
   program.on('option:debug', function () {
