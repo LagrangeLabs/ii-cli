@@ -9,6 +9,7 @@ const commander = require('commander');
 const pkg = require('../package.json');
 const log = require('@ii-cli/log');
 const init = require('@ii-cli/init');
+const exec = require('@ii-cli/exec');
 const { LOWEST_NODE_VERSION, DFT_CLI_HOME } = require('./const');
 
 const program = new commander.Command(); // 实例化一个脚手架对象
@@ -110,12 +111,12 @@ function registerCommand() {
     .option('-tp, --targetPath <targetPath>', '是否指定本地调试文件路径', '');
 
   // 进行命令注册
-  program.command('init [projectName]').option('-f, --force', '是否强制初始化项目').action(init);
+  program.command('init [projectName]').option('-f, --force', '是否强制初始化项目').action(exec);
 
   program.on('option:targetPath', function () {
     const options = program.opts();
     // 通过设置环境变量来进行业务逻辑的解耦，避免进行参数传递
-    process.env.CL_TARGET_PATH = options.targetPath;
+    process.env.CLI_TARGET_PATH = options.targetPath;
   });
 
   // 监听debug时间，开启DEBUG模式
