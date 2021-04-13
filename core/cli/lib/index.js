@@ -113,8 +113,10 @@ function registerCommand() {
   // 进行命令注册
   program.command('init [projectName]').option('-f, --force', '是否强制初始化项目').action(exec);
 
+  // 监听targetPath
   program.on('option:targetPath', function () {
     const options = program.opts();
+
     // 通过设置环境变量来进行业务逻辑的解耦，避免进行参数传递
     process.env.CLI_TARGET_PATH = options.targetPath;
   });
