@@ -2,18 +2,26 @@
 
 module.exports = exec;
 
+const log = require('@ii-cli/log');
 const Package = require('@ii-cli/package');
 
+const SETTINGS = {
+  init: '@ii-cli/init',
+};
+
 function exec() {
-  // TODO
-  const pkg = new Package();
-  console.log('targetPath:', pkg);
-  console.log(process.env.CLI_TARGET_PATH);
+  const targetPath = process.env.CLI_TARGET_PATH;
 
-  // 1. targetPath => modulePath
-  // 2. modulePath => Package(npm模块)
-  // 3. Package.getRootFile(获取入口文件)
-  // 4. Package.update/ Package.install
+  // 参数是通过command传递进来的，数量不定。可以通过arguments来进行处理
+  const cmdObj = arguments[arguments.length - 1];
+  const cmdName = cmdObj.name();
+  const packageName = SETTINGS[cmdName];
+  const packageVersion = 'latest';
 
-  // 封装 -> 复用
+  const pkg = new Package({
+    targetPath,
+    packageName,
+    packageVersion,
+  });
+  console.log('pkg:', pkg.getRootFilePath());
 }
