@@ -2,8 +2,10 @@
 
 const path = require('path');
 const pkgDir = require('pkg-dir').sync; // 使用同步方法
+const npminstall = require('npminstall');
 const { isObject } = require('@ii-cli/utils');
 const formatPath = require('@ii-cli/format-path');
+const { getDftRegistry } = require('@ii-cli/get-npm-info');
 
 class Package {
   constructor(options) {
@@ -16,7 +18,7 @@ class Package {
     }
 
     this.targetPath = options.targetPath; // package的路径
-    this.storePath = options.storePath; // package的存储路径
+    this.storeDir = options.storeDir; // 缓存package的路径
     this.packageName = options.packageName;
     this.packageVersion = options.packageVersion;
   }
@@ -25,7 +27,14 @@ class Package {
   exists() {}
 
   // 安装Package
-  install() {}
+  install() {
+    npminstall({
+      root: this.targetPath,
+      storeDir: this.storeDir,
+      registry: getDftRegistry(),
+      pkgs: [{ name: this.packageName, version: this.packageVersion }],
+    });
+  }
 
   // 更新Pacakge
   update() {}

@@ -27,8 +27,10 @@
     "url": "https://github.com/LagrangeLabs/ii-cli/issues"
   },
   "dependencies": {
-    "@ii-cli/utils": "file:../../utils/utils",
     "@ii-cli/format-path": "file:../../utils/format-path",
+    "@ii-cli/utils": "file:../../utils/utils",
+    "@ii-cli/get-npm-info": "file:../../utils/get-npm-info",
+    "npminstall": "^4.11.0",
     "pkg-dir": "^5.0.0"
   }
 }
