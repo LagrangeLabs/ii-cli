@@ -28,7 +28,8 @@ class Package {
 
   // 安装Package
   install() {
-    npminstall({
+    // npminstall 返回的是Promise
+    return npminstall({
       root: this.targetPath,
       storeDir: this.storeDir,
       registry: getDftRegistry(),

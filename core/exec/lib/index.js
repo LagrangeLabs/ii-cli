@@ -1,19 +1,18 @@
 'use strict';
 
-module.exports = exec;
-
 const path = require('path');
 const log = require('@ii-cli/log');
 const Package = require('@ii-cli/package');
 
 const SETTINGS = {
-  init: '@ii-cli/init',
+  init: '@ii-cli/utils',
 };
 
 const CACHE_DIR = 'dependencies';
 
-function exec() {
+async function exec() {
   let storeDir = '';
+  let pkg;
   let targetPath = process.env.CLI_TARGET_PATH;
   const homePath = process.env.CLI_HOME_PATH;
 
@@ -29,13 +28,35 @@ function exec() {
 
     log.verbose('targetPath:', targetPath);
     log.verbose('storeDir:', storeDir);
+
+    pkg = new Package({
+      targetPath,
+      storeDir,
+      packageName,
+      packageVersion,
+    });
+
+    if (pkg.exists()) {
+      // 更新package
+    } else {
+      // 安装package
+      await pkg.install();
+    }
+  } else {
+    pkg = new Package({
+      targetPath,
+      storeDir,
+      packageName,
+      packageVersion,
+    });
   }
 
-  const pkg = new Package({
-    targetPath,
-    storeDir,
-    packageName,
-    packageVersion,
-  });
+  const rootFile = pkg.getRootFilePath();
+  if (rootFile) {
+    require(rootFile).apply(null, arguments); // 执行该文件
+  }
+
   console.log('pkg:', pkg.getRootFilePath());
 }
+
+module.exports = exec;
