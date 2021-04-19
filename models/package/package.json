@@ -28,9 +28,11 @@
   },
   "dependencies": {
     "@ii-cli/format-path": "file:../../utils/format-path",
-    "@ii-cli/utils": "file:../../utils/utils",
     "@ii-cli/get-npm-info": "file:../../utils/get-npm-info",
+    "@ii-cli/utils": "file:../../utils/utils",
+    "axios": "^0.21.1",
     "npminstall": "^4.11.0",
+    "path-exists": "^4.0.0",
     "pkg-dir": "^5.0.0"
   }
 }

@@ -2,10 +2,11 @@
 
 const path = require('path');
 const pkgDir = require('pkg-dir').sync; // 使用同步方法
+const pathExists = require('path-exists').sync;
 const npminstall = require('npminstall');
 const { isObject } = require('@ii-cli/utils');
 const formatPath = require('@ii-cli/format-path');
-const { getDftRegistry } = require('@ii-cli/get-npm-info');
+const { getDftRegistry, getNpmLatestVersion } = require('@ii-cli/get-npm-info');
 
 class Package {
   constructor(options) {
@@ -21,13 +22,37 @@ class Package {
     this.storeDir = options.storeDir; // 缓存package的路径
     this.packageName = options.packageName;
     this.packageVersion = options.packageVersion;
+    this.cacheFilePathPrefix = this.packageName.replace('/', '_');
+  }
+
+  async prepare() {
+    if (this.packageVersion === 'latest') {
+      this.packageVersion = await getNpmLatestVersion(this.packageName);
+    }
+
+    console.log('prepare:', this.packageVersion);
+  }
+
+  get cacheFilePath() {
+    // 举例：将 @ii-cli/utils => _@ii-cli_utils@1.0.6@@ii-cli
+    return path.resolve(this.storeDir, `_${this.cacheFilePathPrefix}@${this.packageVersion}@${this.packageName}`);
   }
 
   // 判断当前Package是否存在
-  exists() {}
+  async exists() {
+    if (this.storeDir) {
+      await this.prepare();
+      console.log(this.cacheFilePath);
+      return pathExists(this.cacheFilePath);
+    } else {
+      return pathExists(this.targetPath);
+    }
+  }
 
   // 安装Package
-  install() {
+  async install() {
+    await this.prepare();
+
     // npminstall 返回的是Promise
     return npminstall({
       root: this.targetPath,
