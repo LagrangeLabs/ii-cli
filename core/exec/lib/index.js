@@ -54,10 +54,11 @@ async function exec() {
 
   const rootFile = pkg.getRootFilePath();
   if (rootFile) {
-    require(rootFile).apply(null, arguments); // 执行该文件
+    // 通过require的方式来执行该文件(在当前进程中调用)
+    // 利用Array.from将类数组直接转化成数据结构
+    require(rootFile).call(null, Array.from(arguments));
+    // 由于安装文件比较消耗性能，所以需将其放置子进程中
   }
-
-  console.log('pkg:', pkg.getRootFilePath());
 }
 
 module.exports = exec;

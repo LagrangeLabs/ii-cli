@@ -92,16 +92,23 @@ class Package {
 
   // 获取 package.json 指定的入口文件路径
   getRootFilePath() {
-    const dir = pkgDir(this.targetPath); //  获取package.json所在目录
+    function _getRootFile(targetPath) {
+      const dir = pkgDir(targetPath); //  获取package.json所在目录
 
-    if (dir) {
-      const pkgFile = require(path.resolve(dir, 'package.json'));
-      if (pkgFile && pkgFile.main) {
-        return formatPath(path.resolve(dir, pkgFile.main)); // 找到main指定的文件
+      if (dir) {
+        const pkgFile = require(path.resolve(dir, 'package.json'));
+        if (pkgFile && pkgFile.main) {
+          return formatPath(path.resolve(dir, pkgFile.main)); // 找到main指定的文件
+        }
       }
+      return null;
     }
 
-    return null;
+    if (this.storeDir) {
+      return _getRootFile(this.cacheFilePath);
+    } else {
+      return _getRootFile(this.targetPath);
+    }
   }
 }
 
