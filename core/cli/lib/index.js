@@ -1,7 +1,6 @@
 'use strict';
 
 const path = require('path');
-const semver = require('semver');
 const colors = require('colors/safe');
 const userHome = require('user-home');
 const pathExists = require('path-exists').sync; // 使用同步
@@ -10,7 +9,6 @@ const pkg = require('../package.json');
 const log = require('@ii-cli/log');
 const init = require('@ii-cli/init');
 const exec = require('@ii-cli/exec');
-const { LOWEST_NODE_VERSION, DFT_CLI_HOME } = require('./const');
 
 const program = new commander.Command(); // 实例化一个脚手架对象
 
@@ -28,7 +26,6 @@ async function core() {
  */
 async function prepare() {
   checkPkgVer();
-  checkNodeVer();
   checkRoot();
   checkUserHome();
   checkEnv();
@@ -38,12 +35,6 @@ function checkPkgVer() {
   log.info('cli', pkg.version);
 }
 
-// 避免部分 Node API 在低版本时不支持
-function checkNodeVer() {
-  const currentVer = process.version;
-  if (!semver.gte(currentVer, LOWEST_NODE_VERSION)) {
-    throw new Error(colors.red(`ii-cli 需要安装 v${LOWEST_NODE_VERSION} 以上版本的Node.js`));
-  }
 }
 
 /**

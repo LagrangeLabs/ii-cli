@@ -25,5 +25,9 @@
   },
   "bugs": {
     "url": "https://github.com/LagrangeLabs/ii-cli/issues"
+  },
+  "dependencies": {
+    "colors": "^1.4.0",
+    "semver": "^7.3.5"
   }
 }
