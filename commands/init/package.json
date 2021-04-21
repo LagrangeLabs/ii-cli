@@ -27,6 +27,7 @@
     "url": "https://github.com/LagrangeLabs/ii-cli/issues"
   },
   "dependencies": {
-    "@ii-cli/command": "file:../../models/command"
+    "@ii-cli/command": "file:../../models/command",
+    "@ii-cli/log": "file:../../utils/log"
   }
 }

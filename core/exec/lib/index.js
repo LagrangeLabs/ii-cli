@@ -54,10 +54,15 @@ async function exec() {
 
   const rootFile = pkg.getRootFilePath();
   if (rootFile) {
-    // 通过require的方式来执行该文件(在当前进程中调用)
-    // 利用Array.from将类数组直接转化成数据结构
-    require(rootFile).call(null, Array.from(arguments));
-    // 由于安装文件比较消耗性能，所以需将其放置子进程中
+    // 注：exec方法是异步执行，针对这个Promise的异常需单独添加异常捕获
+    try {
+      // 通过require的方式来执行该文件(在当前进程中调用)
+      // 利用Array.from将类数组直接转化成数据结构
+      require(rootFile).call(null, Array.from(arguments));
+      // 由于安装文件比较消耗性能，所以需将其放置子进程中
+    } catch (e) {
+      log.error(e.message);
+    }
   }
 }
 
