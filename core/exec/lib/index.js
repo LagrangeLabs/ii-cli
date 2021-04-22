@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const cp = require('child_process');
 const log = require('@ii-cli/log');
 const Package = require('@ii-cli/package');
 
@@ -58,8 +59,34 @@ async function exec() {
     try {
       // 通过require的方式来执行该文件(在当前进程中调用)
       // 利用Array.from将类数组直接转化成数据结构
-      require(rootFile).call(null, Array.from(arguments));
+      const args = Array.from(arguments);
+      const cmd = args[args.length - 1];
+      const o = Object.create(null); //创建一个没有原型链的对象
+      Object.keys(cmd).forEach((key) => {
+        // 判断是否是原型链上的property
+        if (cmd.hasOwnProperty(key) && !key.startsWith('_') && key !== 'parent') {
+          o[key] = cmd[key];
+        }
+      });
+      args[args.length - 1] = o;
+
       // 由于安装文件比较消耗性能，所以需将其放置子进程中
+      const code = `require('${rootFile}').call(null, ${JSON.stringify(args)})`;
+      const child = cp.spawn('node', ['-e', code], {
+        cwd: process.cwd(),
+        stdio: 'inherit',
+      });
+
+      // 监测命令执行失败
+      child.on('error', (e) => {
+        log.error(e.message);
+        process.exit(1);
+      });
+
+      child.on('exit', (e) => {
+        log.verbose('命令执行成功：', e);
+        process.exit(e);
+      });
     } catch (e) {
       log.error(e.message);
     }
