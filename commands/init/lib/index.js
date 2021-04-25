@@ -6,6 +6,9 @@ const inquirer = require('inquirer');
 const Command = require('@ii-cli/command');
 const log = require('@ii-cli/log');
 
+const TYPE_PROJECT = 'project';
+const TYPE_COMPONENT = 'component';
+
 class InitCommand extends Command {
   init() {
     this.projectName = this._argv[0] || '';
@@ -65,8 +68,70 @@ class InitCommand extends Command {
       }
     }
 
-    // 3. 选择创建项目或组件
-    // 4. 获取项目的基本信息
+    return this.getProjectInfo();
+  }
+
+  async getProjectInfo() {
+    const projectInfo = {};
+
+    // 选择创建项目或组件
+    const { type } = await inquirer.prompt({
+      type: 'list',
+      name: 'type',
+      message: '请选择初始化类型',
+      default: TYPE_PROJECT,
+      choices: [
+        {
+          name: '项目',
+          value: TYPE_PROJECT,
+        },
+        {
+          name: '组件',
+          value: TYPE_COMPONENT,
+        },
+      ],
+    });
+
+    log.verbose('创建类型：', type);
+
+    if (type === TYPE_PROJECT) {
+      // 获取项目的基本信息
+      const info = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'projectName',
+          message: '请输入项目名称',
+          default: '',
+          validate: function (v) {
+            // 验证
+            return typeof v === 'string';
+          },
+          filter: function (v) {
+            // 过滤
+            return v;
+          },
+        },
+        {
+          type: 'input',
+          name: 'projectVersion',
+          message: '请输入项目版本号',
+          default: '',
+          validate: function (v) {
+            // 验证
+            return typeof v === 'string';
+          },
+          filter: function (v) {
+            // 过滤
+            return v;
+          },
+        },
+      ]);
+
+      console.log('projectName:', info);
+    } else if (type === TYPE_COMPONENT) {
+    }
+
+    return projectInfo;
   }
 
   isDirEmpty(localPath) {
