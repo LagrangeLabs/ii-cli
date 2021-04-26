@@ -30,6 +30,7 @@
     "@ii-cli/command": "file:../../models/command",
     "@ii-cli/log": "file:../../utils/log",
     "fs-extra": "^9.1.0",
-    "inquirer": "^8.0.0"
+    "inquirer": "^8.0.0",
+    "semver": "^7.3.5"
   }
 }

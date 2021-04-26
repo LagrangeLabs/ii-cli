@@ -3,6 +3,7 @@
 const fs = require('fs');
 const fse = require('fs-extra');
 const inquirer = require('inquirer');
+const semver = require('semver');
 const Command = require('@ii-cli/command');
 const log = require('@ii-cli/log');
 
@@ -103,8 +104,25 @@ class InitCommand extends Command {
           message: '请输入项目名称',
           default: '',
           validate: function (v) {
-            // 验证
-            return typeof v === 'string';
+            const done = this.async();
+            setTimeout(function () {
+              /**
+               * 验证规则：
+               * + 首字符必须以`ii`开头；
+               * + 尾字符必须以`fe`结尾；
+               * + 字符仅允许中划线`-`
+               *
+               * 举例：ii-brain-fe 合法
+               */
+              if (!/^ii([-][a-zA-Z]+)+-fe$/.test(v)) {
+                done('请输入合法的项目名称，eg: ii-brain-fe');
+                return;
+              }
+
+              // Pass the return value in the done callback
+              done(null, true);
+            }, 0);
+            return;
           },
           filter: function (v) {
             // 过滤
@@ -115,19 +133,30 @@ class InitCommand extends Command {
           type: 'input',
           name: 'projectVersion',
           message: '请输入项目版本号',
-          default: '',
+          default: '1.0.0',
           validate: function (v) {
-            // 验证
-            return typeof v === 'string';
+            const done = this.async();
+            setTimeout(function () {
+              // 借助semver判断版本号
+              if (!semver.valid(v)) {
+                done('请输入合法的项目版本号，eg: 1.0.0');
+                return;
+              }
+
+              // Pass the return value in the done callback
+              done(null, true);
+            }, 0);
+            return;
           },
           filter: function (v) {
-            // 过滤
-            return v;
+            if (!!semver.valid(v)) {
+              return semver.valid(v);
+            } else {
+              return v;
+            }
           },
         },
       ]);
-
-      console.log('projectName:', info);
     } else if (type === TYPE_COMPONENT) {
     }
 
