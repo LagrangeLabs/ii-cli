@@ -22,14 +22,20 @@ class InitCommand extends Command {
   async exec() {
     try {
       // 1. 准备阶段
-      const ret = await this.prepare();
-      if (ret) {
+      const projectInfo = await this.prepare();
+      if (projectInfo) {
         // 2. 下载模板
+        log.verbose('projectInfo:', projectInfo);
+        this.downloadTemplate();
         // 3. 安装模板
       }
     } catch (e) {
       log.error(e.message);
     }
+  }
+
+  downloadTemplate() {
+    // 通过项目模板API获取项目模板信息
   }
 
   async prepare() {
@@ -73,7 +79,7 @@ class InitCommand extends Command {
   }
 
   async getProjectInfo() {
-    const projectInfo = {};
+    let projectInfo = {};
 
     // 选择创建项目或组件
     const { type } = await inquirer.prompt({
@@ -157,6 +163,11 @@ class InitCommand extends Command {
           },
         },
       ]);
+
+      projectInfo = {
+        type,
+        ...info,
+      };
     } else if (type === TYPE_COMPONENT) {
     }
 
