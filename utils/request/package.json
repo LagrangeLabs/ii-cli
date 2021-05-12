@@ -1,5 +1,5 @@
 {
-  "name": "@ii-cli/init",
+  "name": "@ii-cli/request",
   "version": "1.0.6",
   "description": "> TODO: description",
   "author": "Bian2017 <bgl_cumt_zju@163.com>",
@@ -27,11 +27,6 @@
     "url": "https://github.com/LagrangeLabs/ii-cli/issues"
   },
   "dependencies": {
-    "@ii-cli/command": "file:../../models/command",
-    "@ii-cli/log": "file:../../utils/log",
-    "@ii-cli/request": "file:../../utils/request",
-    "fs-extra": "^9.1.0",
-    "inquirer": "^8.0.0",
-    "semver": "^7.3.5"
+    "axios": "^0.21.1"
   }
 }

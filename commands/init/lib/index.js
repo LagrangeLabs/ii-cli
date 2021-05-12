@@ -7,6 +7,8 @@ const semver = require('semver');
 const Command = require('@ii-cli/command');
 const log = require('@ii-cli/log');
 
+const getProjectTemplate = require('./getProjectTemplate');
+
 const TYPE_PROJECT = 'project';
 const TYPE_COMPONENT = 'component';
 
@@ -39,9 +41,13 @@ class InitCommand extends Command {
   }
 
   async prepare() {
-    const localPath = process.cwd();
+    // 判断项目模板是否存在
+    const template = await getProjectTemplate();
+
+    console.log('template:', template);
 
     // 判断当前目录是否为空
+    const localPath = process.cwd();
     if (!this.isDirEmpty(localPath)) {
       let ifContinue = false;
       if (!this.force) {
