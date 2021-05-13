@@ -9,4 +9,13 @@ const request = axios.create({
   timeout: 5000,
 });
 
+request.interceptors.response.use(
+  (response) => {
+    return response.data;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 module.exports = request;
