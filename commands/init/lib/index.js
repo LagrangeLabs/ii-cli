@@ -16,6 +16,9 @@ const getProjectTemplate = require('./getProjectTemplate');
 const TYPE_PROJECT = 'project';
 const TYPE_COMPONENT = 'component';
 
+const TEMPLATE_TYPE_NORMAL = 'normal'; // 标准模板
+const TEMPLATE_TYPE_CUSTOM = 'custom'; // 自定义模板
+
 class InitCommand extends Command {
   init() {
     this.projectName = this._argv[0] || '';
@@ -35,10 +38,40 @@ class InitCommand extends Command {
         this.projectInfo = projectInfo;
         await this.downloadTemplate();
         // 3. 安装模板
+        await this.installTemplate();
       }
     } catch (e) {
       log.error(e.message);
     }
+  }
+
+  // 安装模板
+  async installTemplate() {
+    if (this.templateInfo) {
+      if (!this.templateInfo.type) {
+        this.templateInfo.type = TEMPLATE_TYPE_NORMAL;
+      }
+
+      if (this.templateInfo.type === TEMPLATE_TYPE_NORMAL) {
+        await this.installNormalTemplate();
+      } else if (this.templateInfo.type === TEMPLATE_TYPE_CUSTOM) {
+        await this.installCustomTemplate();
+      } else {
+        throw new Error('无法识别项目模板类型');
+      }
+    } else {
+      throw new Error('项目模板信息不存在!');
+    }
+  }
+
+  // 标准模板安装
+  async installNormalTemplate() {
+    console.log('安装标准模板');
+  }
+
+  // 自定义模板安装
+  async installCustomTemplate() {
+    console.log('安装自定义模板');
   }
 
   async downloadTemplate() {
@@ -46,6 +79,7 @@ class InitCommand extends Command {
     const { projectTemplate } = this.projectInfo;
 
     const templateInfo = this.template.find((item) => item.npmName === projectTemplate);
+    this.templateInfo = templateInfo;
 
     // 专门用户缓存项目模板
     const targetPath = path.resolve(userHome, '.ii-cli', 'template');
@@ -65,11 +99,13 @@ class InitCommand extends Command {
 
       try {
         await templateNpm.install();
-        log.success('模板下载成功');
       } catch (err) {
         throw err;
       } finally {
         spinner.stop(true); // true 表示清除loading文字
+        if (await templateNpm.exists()) {
+          log.success('模板下载成功');
+        }
       }
     } else {
       const spinner = spinnerStart('正在更新模板...');
@@ -77,11 +113,13 @@ class InitCommand extends Command {
 
       try {
         await templateNpm.update();
-        log.success('模板更新成功');
       } catch (err) {
         throw err;
       } finally {
         spinner.stop(true);
+        if (await templateNpm.exists()) {
+          log.success('模板更新成功');
+        }
       }
     }
   }
