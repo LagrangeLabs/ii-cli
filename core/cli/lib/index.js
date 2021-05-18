@@ -35,8 +35,6 @@ function checkPkgVer() {
   log.info('cli', pkg.version);
 }
 
-}
-
 /**
  * 检查 root 账户
  *
