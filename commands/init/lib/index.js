@@ -9,6 +9,7 @@ const Command = require('@ii-cli/command');
 const userHome = require('user-home');
 const Package = require('@ii-cli/package');
 const log = require('@ii-cli/log');
+const { spinnerStart, sleep } = require('@ii-cli/utils');
 
 const getProjectTemplate = require('./getProjectTemplate');
 
@@ -59,9 +60,17 @@ class InitCommand extends Command {
     });
 
     if (!(await templateNpm.exists())) {
+      const spinner = spinnerStart('正在下载模板...');
+      await sleep();
       await templateNpm.install();
+      spinner.stop(true); // true 表示清除loading文字
+      log.success('模板下载成功');
     } else {
+      const spinner = spinnerStart('正在更新模板...');
+      await sleep();
       await templateNpm.update();
+      spinner.stop(true); // true 表示清除loading文字
+      log.success('模板更新成功');
     }
   }
 

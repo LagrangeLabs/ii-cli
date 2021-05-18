@@ -20,6 +20,7 @@
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
+    "cli-spinner": "^0.2.10",
     "lodash": "^4.17.21"
   },
   "gitHead": "99ff08e67dd6f82371c122aec0824f053f64643e"
