@@ -1,10 +1,13 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
 const fse = require('fs-extra');
 const inquirer = require('inquirer');
 const semver = require('semver');
 const Command = require('@ii-cli/command');
+const userHome = require('user-home');
+const Package = require('@ii-cli/package');
 const log = require('@ii-cli/log');
 
 const getProjectTemplate = require('./getProjectTemplate');
@@ -29,7 +32,7 @@ class InitCommand extends Command {
         // 2. 下载模板
         log.verbose('projectInfo:', projectInfo);
         this.projectInfo = projectInfo;
-        this.downloadTemplate();
+        await this.downloadTemplate();
         // 3. 安装模板
       }
     } catch (e) {
@@ -37,8 +40,29 @@ class InitCommand extends Command {
     }
   }
 
-  downloadTemplate() {
+  async downloadTemplate() {
     // 通过项目模板API获取项目模板信息
+    const { projectTemplate } = this.projectInfo;
+
+    const templateInfo = this.template.find((item) => item.npmName === projectTemplate);
+
+    // 专门用户缓存项目模板
+    const targetPath = path.resolve(userHome, '.ii-cli', 'template');
+    const storeDir = path.resolve(userHome, '.ii-cli', 'template', 'node_modules');
+
+    const { npmName, version } = templateInfo;
+    const templateNpm = new Package({
+      targetPath,
+      storeDir,
+      packageName: npmName,
+      packageVersion: version,
+    });
+
+    if (!(await templateNpm.exists())) {
+      await templateNpm.install();
+    } else {
+      await templateNpm.update();
+    }
   }
 
   async prepare() {

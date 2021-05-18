@@ -29,9 +29,11 @@
   "dependencies": {
     "@ii-cli/command": "file:../../models/command",
     "@ii-cli/log": "file:../../utils/log",
+    "@ii-cli/package": "file:../../models/package",
     "@ii-cli/request": "file:../../utils/request",
     "fs-extra": "^9.1.0",
     "inquirer": "^8.0.0",
-    "semver": "^7.3.5"
+    "semver": "^7.3.5",
+    "user-home": "^3.0.0"
   }
 }
