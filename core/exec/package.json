@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@ii-cli/log": "file:../../utils/log",
-    "@ii-cli/package": "file:../../models/package"
+    "@ii-cli/package": "file:../../models/package",
+    "@ii-cli/utils": "file:../../utils/utils"
   }
 }

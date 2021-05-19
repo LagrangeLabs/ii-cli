@@ -1,9 +1,9 @@
 'use strict';
 
 const path = require('path');
-const cp = require('child_process');
 const log = require('@ii-cli/log');
 const Package = require('@ii-cli/package');
+const { exec: spwan } = require('@ii-cli/utils');
 
 const SETTINGS = {
   init: '@ii-cli/utils',
@@ -72,7 +72,7 @@ async function exec() {
 
       // 由于安装文件比较消耗性能，所以需将其放置子进程中
       const code = `require('${rootFile}').call(null, ${JSON.stringify(args)})`;
-      const child = spawn('node', ['-e', code], {
+      const child = spwan('node', ['-e', code], {
         cwd: process.cwd(),
         stdio: 'inherit',
       });
@@ -91,17 +91,6 @@ async function exec() {
       log.error(e.message);
     }
   }
-}
-
-function spawn(command, args, options) {
-  const win32 = process.platform === 'win32';
-
-  // cmd 是执行的主参数
-  const cmd = win32 ? 'cmd' : command;
-  // 'c' 表示静默执行
-  const cmdArgs = win32 ? ['/c'].concat(command, args) : args;
-
-  return cp.spawn(cmd, cmdArgs, options || {});
 }
 
 module.exports = exec;

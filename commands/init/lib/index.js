@@ -9,7 +9,7 @@ const Command = require('@ii-cli/command');
 const userHome = require('user-home');
 const Package = require('@ii-cli/package');
 const log = require('@ii-cli/log');
-const { spinnerStart, sleep } = require('@ii-cli/utils');
+const { spinnerStart, sleep, execAsync } = require('@ii-cli/utils');
 
 const getProjectTemplate = require('./getProjectTemplate');
 
@@ -84,6 +84,41 @@ class InitCommand extends Command {
     } finally {
       spinner.stop(true);
       log.success('模板安装成功');
+    }
+
+    // 安装依赖
+    const { installCommand, startCommand } = this.templateInfo;
+
+    let installResult;
+    if (installCommand) {
+      const installCmd = installCommand.split(' ');
+      const cmd = installCmd[0];
+      const args = installCmd.slice(1);
+
+      installResult = await execAsync(cmd, args, {
+        stdio: 'inherit', // 在当前的主进行进行打印
+        cwd: process.cwd(),
+      });
+
+      console.log('installCmd:', installCmd, cmd, args, installResult);
+    }
+
+    if (installResult !== 0) {
+      throw new Error('依赖安装失败，请手动安装');
+    }
+
+    // 启动命令执行
+    if (startCommand) {
+      const startCmd = startCommand.split(' ');
+      const cmd = startCmd[0];
+      const args = startCmd.slice(1);
+
+      await execAsync(cmd, args, {
+        stdio: 'inherit',
+        cwd: process.cwd(),
+      });
+
+      console.log('startCommand:', startCmd, cmd, args);
     }
   }
 
