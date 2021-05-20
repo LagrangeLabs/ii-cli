@@ -19,6 +19,8 @@ const TYPE_COMPONENT = 'component';
 const TEMPLATE_TYPE_NORMAL = 'normal'; // 标准模板
 const TEMPLATE_TYPE_CUSTOM = 'custom'; // 自定义模板
 
+const WHITE_COMMAND = ['npm', 'cnpm']; // 添加命令白名单，防止有非法命令
+
 class InitCommand extends Command {
   init() {
     this.projectName = this._argv[0] || '';
@@ -64,6 +66,42 @@ class InitCommand extends Command {
     }
   }
 
+  /**
+   * 检查命令是否在白名单里
+   */
+  checkCommand(cmd) {
+    if (WHITE_COMMAND.includes(cmd)) {
+      return cmd;
+    }
+
+    return null;
+  }
+
+  /**
+   * 执行命令
+   */
+  async execCommand(command, errMsg) {
+    let ret;
+
+    if (command) {
+      const cmdArray = command.split(' ');
+      const cmd = this.checkCommand(cmdArray[0]);
+      if (!cmd) {
+        throw new Error(`命令 '${command}' 无法执行!`);
+      }
+      const args = cmdArray.slice(1);
+
+      ret = await execAsync(cmd, args, {
+        stdio: 'inherit', // 在当前的主进行进行打印
+        cwd: process.cwd(),
+      });
+    }
+
+    if (ret !== 0) {
+      throw new Error(errMsg);
+    }
+  }
+
   // 标准模板安装
   async installNormalTemplate() {
     let spinner = spinnerStart('正在安装模板...');
@@ -89,37 +127,8 @@ class InitCommand extends Command {
     // 安装依赖
     const { installCommand, startCommand } = this.templateInfo;
 
-    let installResult;
-    if (installCommand) {
-      const installCmd = installCommand.split(' ');
-      const cmd = installCmd[0];
-      const args = installCmd.slice(1);
-
-      installResult = await execAsync(cmd, args, {
-        stdio: 'inherit', // 在当前的主进行进行打印
-        cwd: process.cwd(),
-      });
-
-      console.log('installCmd:', installCmd, cmd, args, installResult);
-    }
-
-    if (installResult !== 0) {
-      throw new Error('依赖安装失败，请手动安装');
-    }
-
-    // 启动命令执行
-    if (startCommand) {
-      const startCmd = startCommand.split(' ');
-      const cmd = startCmd[0];
-      const args = startCmd.slice(1);
-
-      await execAsync(cmd, args, {
-        stdio: 'inherit',
-        cwd: process.cwd(),
-      });
-
-      console.log('startCommand:', startCmd, cmd, args);
-    }
+    await this.execCommand(installCommand, '依赖安装失败');
+    await this.execCommand(startCommand, '命令启动失败');
   }
 
   // 自定义模板安装
