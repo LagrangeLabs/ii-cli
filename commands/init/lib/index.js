@@ -5,6 +5,8 @@ const path = require('path');
 const fse = require('fs-extra');
 const inquirer = require('inquirer');
 const semver = require('semver');
+const ejs = require('ejs');
+const glob = require('glob');
 const Command = require('@ii-cli/command');
 const userHome = require('user-home');
 const Package = require('@ii-cli/package');
@@ -102,6 +104,53 @@ class InitCommand extends Command {
     }
   }
 
+  async renderEjs(options) {
+    const dir = process.cwd();
+
+    return new Promise((resolve, reject) => {
+      // 遍历当前整个目录
+      glob(
+        '**',
+        {
+          cwd: dir,
+          ignore: options.ignore || '', // 忽略哪些文件夹
+          nodir: true, // 不处理目录
+        },
+        (err, files) => {
+          if (err) {
+            reject(err);
+          }
+
+          Promise.all(
+            files.map((file) => {
+              const filePath = path.join(dir, file);
+
+              return new Promise((resolve1, reject1) => {
+                ejs.renderFile(filePath, {}, (err, result) => {
+                  console.log(err, result);
+
+                  if (err) {
+                    reject1(err);
+                  } else {
+                    resolve1(result);
+                  }
+                });
+              });
+            })
+          )
+            .then(() => {
+              resolve();
+            })
+            .catch((err) => {
+              reject(err);
+            });
+
+          console.log('files:', files);
+        }
+      );
+    });
+  }
+
   // 标准模板安装
   async installNormalTemplate() {
     let spinner = spinnerStart('正在安装模板...');
@@ -123,6 +172,9 @@ class InitCommand extends Command {
       spinner.stop(true);
       log.success('模板安装成功');
     }
+
+    const ignore = ['node_modules/**', 'src/pages/document.ejs'];
+    await this.renderEjs({ ignore });
 
     // 安装依赖
     const { installCommand, startCommand } = this.templateInfo;
