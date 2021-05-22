@@ -293,7 +293,16 @@ class InitCommand extends Command {
 
   async getProjectInfo() {
     let projectInfo = {};
+    let isProjectNameValid = false;
 
+    function isValidateName(name) {
+      return /^ii([-][a-zA-Z]+)+-fe$/.test(name);
+    }
+
+    if (isValidateName(this.projectName)) {
+      isProjectNameValid = true;
+      projectInfo.projectName = this.projectName;
+    }
     // 选择创建项目或组件
     const { type } = await inquirer.prompt({
       type: 'list',
@@ -315,39 +324,44 @@ class InitCommand extends Command {
     log.verbose('创建类型：', type);
 
     if (type === TYPE_PROJECT) {
-      // 获取项目的基本信息
-      const info = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'projectName',
-          message: '请输入项目名称',
-          default: '',
-          validate: function (v) {
-            const done = this.async();
-            setTimeout(function () {
-              /**
-               * 验证规则：
-               * + 首字符必须以`ii`开头；
-               * + 尾字符必须以`fe`结尾；
-               * + 字符仅允许中划线`-`
-               *
-               * 举例：ii-brain-fe 合法
-               */
-              if (!/^ii([-][a-zA-Z]+)+-fe$/.test(v)) {
-                done('请输入合法的项目名称，eg: ii-brain-fe');
-                return;
-              }
+      const projectNamePrompt = {
+        type: 'input',
+        name: 'projectName',
+        message: '请输入项目名称',
+        default: '',
+        validate: function (v) {
+          const done = this.async();
+          setTimeout(function () {
+            /**
+             * 验证规则：
+             * + 首字符必须以`ii`开头；
+             * + 尾字符必须以`fe`结尾；
+             * + 字符仅允许中划线`-`
+             *
+             * 举例：ii-brain-fe 合法
+             */
+            if (!isValidateName(v)) {
+              done('请输入合法的项目名称，eg: ii-brain-fe');
+              return;
+            }
 
-              // Pass the return value in the done callback
-              done(null, true);
-            }, 0);
-            return;
-          },
-          filter: function (v) {
-            // 过滤
-            return v;
-          },
+            // Pass the return value in the done callback
+            done(null, true);
+          }, 0);
+          return;
         },
+        filter: function (v) {
+          // 过滤
+          return v;
+        },
+      };
+      const projectPrompt = [];
+
+      if (!isProjectNameValid) {
+        projectPrompt.push(projectNamePrompt);
+      }
+
+      projectPrompt.push(
         {
           type: 'input',
           name: 'projectVersion',
@@ -380,10 +394,14 @@ class InitCommand extends Command {
           name: 'projectTemplate',
           message: '请选择项目模板',
           choices: this.createTemplateChoice(),
-        },
-      ]);
+        }
+      );
+
+      // 获取项目的基本信息
+      const info = await inquirer.prompt(projectPrompt);
 
       projectInfo = {
+        ...projectInfo,
         type,
         ...info,
       };
