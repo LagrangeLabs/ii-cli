@@ -46,6 +46,9 @@ class InitCommand extends Command {
       }
     } catch (e) {
       log.error(e.message);
+      if (process.env.LOG_LEVEL === 'verbose') {
+        console.log('错误栈：', e);
+      }
     }
   }
 
@@ -126,12 +129,13 @@ class InitCommand extends Command {
               const filePath = path.join(dir, file);
 
               return new Promise((resolve1, reject1) => {
-                ejs.renderFile(filePath, {}, (err, result) => {
-                  console.log(err, result);
+                ejs.renderFile(filePath, this.projectInfo, {}, (err, result) => {
+                  // console.log(err, result);
 
                   if (err) {
                     reject1(err);
                   } else {
+                    fse.writeFileSync(filePath, result); // 完成真实的文件写入
                     resolve1(result);
                   }
                 });
@@ -154,7 +158,8 @@ class InitCommand extends Command {
   // 标准模板安装
   async installNormalTemplate() {
     let spinner = spinnerStart('正在安装模板...');
-    await sleep(5000);
+    // await sleep(5000);
+
     try {
       // 拷贝模板代码至当前目录
       const templatePath = path.resolve(this.templateNpm.cacheFilePath, 'template');
@@ -179,8 +184,8 @@ class InitCommand extends Command {
     // 安装依赖
     const { installCommand, startCommand } = this.templateInfo;
 
-    await this.execCommand(installCommand, '依赖安装失败');
-    await this.execCommand(startCommand, '命令启动失败');
+    await this.execCommand(installCommand, '依赖安装过程中出现失败');
+    await this.execCommand(startCommand, '启动执行命令失败');
   }
 
   // 自定义模板安装
@@ -219,8 +224,8 @@ class InitCommand extends Command {
         spinner.stop(true); // true 表示清除loading文字
         if (await templateNpm.exists()) {
           log.success('模板下载成功');
-          this.templateNpm = templateNpm;
         }
+        this.templateNpm = templateNpm;
       }
     } else {
       const spinner = spinnerStart('正在更新模板...');
@@ -234,8 +239,8 @@ class InitCommand extends Command {
         spinner.stop(true);
         if (await templateNpm.exists()) {
           log.success('模板更新成功');
-          this.templateNpm = templateNpm;
         }
+        this.templateNpm = templateNpm;
       }
     }
   }
