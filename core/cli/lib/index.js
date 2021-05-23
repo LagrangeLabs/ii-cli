@@ -31,6 +31,9 @@ async function prepare() {
   checkEnv();
 }
 
+/**
+ * 检查脚手架版本号
+ */
 function checkPkgVer() {
   log.info('cli', pkg.version);
 }
@@ -48,7 +51,11 @@ function checkRoot() {
   rootCheck();
 }
 
-// 检查用户主目录是否存在
+/**
+ * 检查用户主目录是否存在
+ *
+ * 注：在用户主目录下缓存脚手架模板
+ */
 function checkUserHome() {
   if (!userHome || !pathExists(userHome)) {
     throw new Error(colors.red('当前登录用户的主目录不存在'));
@@ -63,9 +70,7 @@ function checkEnv() {
   const dotenvPath = path.resolve(userHome, '.env');
 
   if (pathExists(dotenvPath)) {
-    dotenv.config({
-      path: dotenvPath,
-    });
+    dotenv.config({ path: dotenvPath });
   }
 
   createDftEnvCfg();

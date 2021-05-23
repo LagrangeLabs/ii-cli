@@ -29,7 +29,6 @@ class InitCommand extends Command {
     this.force = !!this._argv[1].force;
 
     log.verbose('projectName:', this.projectName);
-    log.verbose('force:', this.force);
   }
 
   async exec() {
@@ -258,7 +257,7 @@ class InitCommand extends Command {
     if (!this.isDirEmpty(localPath)) {
       let ifContinue = false;
       if (!this.force) {
-        // 询问是否继续创建(将询问结果赋值给ifContinue)
+        // 询问是否继续创建，并将询问结果赋值给ifContinue
         ifContinue = (
           await inquirer.prompt({
             type: 'confirm',
@@ -273,7 +272,7 @@ class InitCommand extends Command {
 
       // 是否启动强制更新
       if (ifContinue || this.force) {
-        // 给用户进行二次确认(清空影响范围大)
+        // 给用户进行二次确认，因为清空目录的影响范围较大
         const { confirmDelete } = await inquirer.prompt({
           type: 'confirm',
           name: 'confirmDelete',
@@ -431,5 +430,5 @@ function init(argv) {
   return new InitCommand(argv);
 }
 
-module.exports = init;
 module.exports.InitCommand = InitCommand;
+module.exports = init;
